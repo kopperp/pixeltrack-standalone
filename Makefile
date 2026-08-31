@@ -35,6 +35,11 @@ HOST_CXXFLAGS := -O2 -fPIC -fdiagnostics-show-option -felide-constructors -fmess
 # Compiler flags supported by GCC but not by the LLVM-based compilers (clang, hipcc, icpx, etc.)
 LLVM_UNSUPPORTED_CXXFLAGS := --param vect-max-version-for-alias-checks=50 -Werror=format-contains-nul -Wno-non-template-friend -Werror=return-local-addr -Werror=unused-but-set-variable
 
+# CADNA implementation is quite noisy
+ifdef CADNA_DEBUG
+  USER_CXXFLAGS += -DCADNA_DEBUG -pg
+endif
+
 export CXXFLAGS := -std=c++20 $(HOST_CXXFLAGS) $(USER_CXXFLAGS) -g
 export NVCXX_CXXFLAGS := -std=c++20 -O0 -cuda -gpu=managed -stdpar -fpic -gopt $(USER_CXXFLAGS)
 export LDFLAGS := -O2 -fPIC -pthread -Wl,-E -lstdc++fs -ldl
@@ -496,6 +501,12 @@ else ifeq ($(OPENMP_COMPILER), NVIDIA)
   export OPENMP_CXXFLAGS := -mp=gpu -gpu=cc80 -std=c++20 -fPIC --gcc-toolchain=$(GCC_TOOLCHAIN) $(OPENMP_EIGEN_CXXFLAGS)
 endif
 
+# CADNA
+CADNA_BASE := $(EXTERNAL_BASE)/cadna
+CADNA_LIBDIR := $(CADNA_BASE)/lib
+export CADNA_CXXFLAGS := -isystem $(CADNA_BASE)/include -I$(CADNA_BASE)/include
+export CADNA_LDFLAGS := -L$(CADNA_LIBDIR) -lcadnaC -Wl,-rpath,$(CADNA_LIBDIR)
+export CADNA_DEPS := $(CADNA_BASE)
 
 # force the recreation of the environment file any time the Makefile is updated, before building any other target
 -include environment
@@ -518,7 +529,7 @@ ifneq ($$(filter $(1),$$($(2)_EXTERNAL_DEPENDS)),)
   TARGETS_$(1) += $(2)
 endif
 endef
-TOOLCHAINS := CUDA ROCM SYCL NVHPC OPENMP
+TOOLCHAINS := CUDA ROCM SYCL NVHPC OPENMP CADNA
 $(foreach toolchain,$(TOOLCHAINS),$(foreach target,$(TARGETS_ALL),$(eval $(call SPLIT_TARGETS_template,$(toolchain),$(target)))))
 
 TARGETS_GCC := $(filter-out $(TARGETS_CUDA) $(TARGETS_ROCM) $(TARGETS_SYCL) $(TARGETS_NVHPC) $(TARGETS_OPENMP),$(TARGETS_ALL))
@@ -630,6 +641,9 @@ ifneq ($(SYCL_BASE),)
 	@# see https://github.com/intel/compute-runtime/blob/master/opencl/doc/FAQ.md#feature-double-precision-emulation-fp64
 	@echo 'export IGC_EnableDPEmulation=1'                                  >> $@
 	@echo 'export OverrideDefaultFP64Settings=1'                            >> $@
+endif
+ifneq ($(wildcard $(CADNA_BASE)),)
+	@echo -n '$(CADNA_LIBDIR):'                                             >> $@
 endif
 ifneq ($(JULIA_BASE),)
 	@echo '# override the Julia depot path'					>> $@
@@ -756,6 +770,7 @@ $(EIGEN_BASE):
 	git clone https://github.com/cms-patatrack/eigen.git $@
 	# include all SYCL updates and CMS/patatrack patches
 	cd $@ && git reset --hard adbb8e379ab50707b44e33303f700868a9ce2f9f
+
 # Boost
 .PHONY: external_boost
 external_boost: $(BOOST_BASE)
@@ -798,6 +813,19 @@ $(HWLOC_BASE):
 	$(MAKE) -C $(HWLOC_TMP) install
 	@rm -rf $(HWLOC_TMP)
 	$(eval undefine HWLOC_TMP)
+
+external_cadna: $(CADNA_BASE)
+
+# Let CADNA define its own CXXFLAGS
+$(CADNA_BASE): CXXFLAGS:=
+$(CADNA_BASE):
+	$(eval CADNA_TMP := $(shell mktemp -d))
+	curl -L https://cadna.lip6.fr/Download_Dir/cadna_c_half-3.1.13.tar.gz | tar xz --strip-components=1 -C $(CADNA_TMP)
+	cd $(CADNA_TMP)/ && ./configure CXX=$(CXX) --prefix=$@ --enable-cadna-shared
+	$(MAKE) -C $(CADNA_TMP)
+	$(MAKE) -C $(CADNA_TMP) install
+	@rm -rf $(CADNA_TMP)
+	$(eval undefine CADNA_TMP)
 
 # Alpaka
 .PHONY: external_alpaka

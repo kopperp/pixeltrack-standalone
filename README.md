@@ -9,6 +9,7 @@
   * [Test program specific notes (if any)](#test-program-specific-notes-if-any)
     * [`fwtest`](#fwtest)
     * [`serial`](#serial)
+    * [`serial-cadna`](#serial-cadna)
     * [`cudatest`](#cudatest)
     * [`cuda`](#cuda)
     * [`cudadev`](#cudadev)
@@ -66,24 +67,25 @@ In addition, the individual programs assume the following be found from the syst
 All other dependencies (listed below) are downloaded and built automatically
 
 
-| Application  | [TBB](https://github.com/intel/tbb) | [Eigen](http://eigen.tuxfamily.org/) | [Kokkos](https://github.com/kokkos/kokkos) | [Boost](https://www.boost.org/) (1) | [Alpaka](https://github.com/alpaka-group/alpaka) | [libbacktrace](https://github.com/ianlancetaylor/libbacktrace) | [hwloc](https://www.open-mpi.org/projects/hwloc/) |
-|--------------|-------------------------------------|--------------------------------------|--------------------------------------------|-------------------------------------|--------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------|
-| `fwtest`     | :heavy_check_mark:                  |                                      |                                            |                                     |                                                  |                                                                |                                                   |
-| `serial`     | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `cudatest`   | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `cuda`       | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `cudadev`    | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `cudauvm`    | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `cudacompat` | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `hiptest`    | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `hip`        | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `kokkostest` | :heavy_check_mark:                  |                                      | :heavy_check_mark:                         | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             | :heavy_check_mark: (2)                            |
-| `kokkos`     | :heavy_check_mark:                  | :heavy_check_mark:                   | :heavy_check_mark:                         |                                     |                                                  |                                                                | :heavy_check_mark: (2)                            |
-| `alpakatest` | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  | :heavy_check_mark:                               |                                                                |                                                   |
-| `alpaka`     | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  | :heavy_check_mark:                               |                                                                |                                                   |
-| `sycltest`   | :heavy_check_mark:                  |                                      |                                            |                                     |                                                  |                                                                |                                                   |
-| `sycl`       | :heavy_check_mark: (3)              | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
-| `stdpar`     | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |
+| Application    | [TBB](https://github.com/intel/tbb) | [Eigen](http://eigen.tuxfamily.org/) | [Kokkos](https://github.com/kokkos/kokkos) | [Boost](https://www.boost.org/) (1) | [Alpaka](https://github.com/alpaka-group/alpaka) | [libbacktrace](https://github.com/ianlancetaylor/libbacktrace) | [hwloc](https://www.open-mpi.org/projects/hwloc/) | [CADNA](https://cadna.lip6.fr) |
+|----------------|-------------------------------------|--------------------------------------|--------------------------------------------|-------------------------------------|--------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------|
+| `fwtest`       | :heavy_check_mark:                  |                                      |                                            |                                     |                                                  |                                                                |                                                   |                                                   |
+| `serial`       | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   | :heavy_check_mark:                                |
+| `serial-cadna` | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `cudatest`     | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `cuda`         | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `cudadev`      | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `cudauvm`      | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `cudacompat`   | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `hiptest`      | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `hip`          | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `kokkostest`   | :heavy_check_mark:                  |                                      | :heavy_check_mark:                         | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             | :heavy_check_mark: (2)                            |                                                   |
+| `kokkos`       | :heavy_check_mark:                  | :heavy_check_mark:                   | :heavy_check_mark:                         |                                     |                                                  |                                                                | :heavy_check_mark: (2)                            |                                                   |
+| `alpakatest`   | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  | :heavy_check_mark:                               |                                                                |                                                   |                                                   |
+| `alpaka`       | :heavy_check_mark:                  |                                      |                                            | :heavy_check_mark:                  | :heavy_check_mark:                               |                                                                |                                                   |                                                   |
+| `sycltest`     | :heavy_check_mark:                  |                                      |                                            |                                     |                                                  |                                                                |                                                   |                                                   |
+| `sycl`         | :heavy_check_mark: (3)              | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
+| `stdpar`       | :heavy_check_mark:                  | :heavy_check_mark:                   |                                            | :heavy_check_mark:                  |                                                  | :heavy_check_mark:                                             |                                                   |                                                   |
 
 
 1. Boost libraries from the system can also be used, but they need to be version 1.73.0 or newer
@@ -224,6 +226,25 @@ CUDA in order to be a "pure CPU" version. Note that the name refers to
 (the absence of) intra-algorithm parallelization and is thus
 comparable to the Serial backend of Alpaka or Kokkos. The event-level
 parallelism is implemented as in `fwtest`.
+
+#### `serial-cadna`
+This program is a fork of `serial` with the additional of the CADNA software
+for the estimation of round-off errors. Additional output can be activated by
+setting the `CADNA_DEBUG` flag:
+```
+make CADNA_DEBUG=1 serial-cadna
+```
+Additionally, a small debugging script for [lldb](https://lldb.llvm.org) is included 
+which stops execution on detected instabilities and can be loaded in the following way:
+```
+lldb -- ./serial-cadna
+(lldb) command script import ./.lldb/cadna_lldb.py
+```
+Since the output of this script can be quite verbose, it allows filtering to specific 
+files via the following filter command:
+```
+cadna_setup <filename>
+```
 
 #### `cudatest`
 
